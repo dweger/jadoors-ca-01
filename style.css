@@ -225,42 +225,51 @@ footer .copyright {
 }
 
 /* ===============================
-   Lightbox
+   Lightbox (FIXED)
 ================================ */
 
 #lightbox {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.9);
-    z-index: 999;
+    display: none;              /* Hides it until opened */
+    position: fixed;            /* REQUIRED: removes it from page flow */
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 9999;              /* Forces it above everything */
     justify-content: center;
     align-items: center;
 }
 
 #lightbox img {
-    max-width: 90%;
-    max-height: 85%;
+    max-width: 90vw;
+    max-height: 85vh;
+    object-fit: contain;
 }
 
+/* Close button */
 .lightbox-close {
     position: absolute;
     top: 20px;
     right: 30px;
     font-size: 40px;
-    color: #fff;
+    color: #ffffff;
     cursor: pointer;
+    z-index: 10000;
 }
 
+/* Navigation arrows */
 .lightbox-prev,
 .lightbox-next {
     position: absolute;
     top: 50%;
+    transform: translateY(-50%);
     font-size: 50px;
-    color: #fff;
+    color: #ffffff;
     cursor: pointer;
     user-select: none;
     padding: 10px;
+    z-index: 10000;
 }
 
 .lightbox-prev {
@@ -271,7 +280,7 @@ footer .copyright {
     right: 20px;
 }
 
-/* Mobile tweaks */
+/* Mobile adjustments */
 @media (max-width: 768px) {
     .lightbox-prev,
     .lightbox-next {
