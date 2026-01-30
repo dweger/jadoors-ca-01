@@ -8,6 +8,7 @@
 </head>
 <body>
 
+<!-- Hero -->
 <header class="hero hero-small">
     <div class="hero-overlay">
         <div class="container">
@@ -17,28 +18,100 @@
     </div>
 </header>
 
+<!-- Gallery -->
 <section>
     <div class="container">
         <div id="gallery" class="gallery-grid"></div>
     </div>
 </section>
 
+<!-- Lightbox -->
+<div id="lightbox">
+    <span class="lightbox-close">&times;</span>
+    <span class="lightbox-prev">&#10094;</span>
+    <img id="lightbox-img" />
+    <span class="lightbox-next">&#10095;</span>
+</div>
+
 <script>
+let images = [];
+let currentIndex = 0;
+
+const IMAGE_BASE_PATH = "assets/imgs/gallery";
+
+/* Load gallery images from JSON */
 fetch("gallery.json")
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
+        images = data.images;
         const gallery = document.getElementById("gallery");
 
-        data.images.forEach(image => {
-            const img = document.createElement("img");
-            img.src = `assets/imgs/gallery/${image}`;
-            img.alt = "JA Doors Project";
-            gallery.appendChild(img);
+        images.forEach((img, index) => {
+            const image = document.createElement("img");
+            image.src = `${IMAGE_BASE_PATH}/${img}`;
+            image.loading = "lazy";
+            image.alt = "JA Doors Project";
+            image.addEventListener("click", () => openLightbox(index));
+            gallery.appendChild(image);
         });
     })
-    .catch(error => {
-        console.error("Gallery loading error:", error);
-    });
+    .catch(err => console.error("Gallery load error:", err));
+
+/* Lightbox controls */
+const lightbox = document.getElementById("lightbox");
+const lightboxImg = document.getElementById("lightbox-img");
+
+function openLightbox(index) {
+    currentIndex = index;
+    lightboxImg.src = `${IMAGE_BASE_PATH}/${images[currentIndex]}`;
+    lightbox.style.display = "flex";
+}
+
+function closeLightbox() {
+    lightbox.style.display = "none";
+}
+
+function nextImage() {
+    currentIndex = (currentIndex + 1) % images.length;
+    lightboxImg.src = `${IMAGE_BASE_PATH}/${images[currentIndex]}`;
+}
+
+function prevImage() {
+    currentIndex = (currentIndex - 1 + images.length) % images.length;
+    lightboxImg.src = `${IMAGE_BASE_PATH}/${images[currentIndex]}`;
+}
+
+/* Click controls */
+document.querySelector(".lightbox-close").onclick = closeLightbox;
+document.querySelector(".lightbox-next").onclick = nextImage;
+document.querySelector(".lightbox-prev").onclick = prevImage;
+
+/* Keyboard controls */
+document.addEventListener("keydown", e => {
+    if (lightbox.style.display === "flex") {
+        if (e.key === "ArrowRight") nextImage();
+        if (e.key === "ArrowLeft") prevImage();
+        if (e.key === "Escape") closeLightbox();
+    }
+});
+
+/* Swipe support (mobile) */
+let touchStartX = 0;
+
+lightbox.addEventListener("touchstart", e => {
+    touchStartX = e.changedTouches[0].screenX;
+});
+
+lightbox.addEventListener("touchend", e => {
+    const touchEndX = e.changedTouches[0].screenX;
+    if (touchEndX < touchStartX - 50) nextImage();
+    if (touchEndX > touchStartX + 50) prevImage();
+});
+
+/* Close when clicking background */
+lightbox.addEventListener("click", e => {
+    if (e.target === lightbox) closeLightbox();
+});
 </script>
 
 </body>
